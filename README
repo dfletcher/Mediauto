@@ -65,7 +65,7 @@ Building:
 Running:
 
     sudo cp etc/dbus-1/system.d/mediauto.conf /etc/dbus-1/system.d/
-	gedit etc/mediauto.conf
+    gedit etc/mediauto.conf
     python site-packages/mediauto.py --config=etc/mediauto.conf
 
 The first line copies the D-Bus configuration rules into your system and is
@@ -77,7 +77,7 @@ Edit the configuration file and change the default dvd.destination and any
 other desired tweaks. The etc/mediauto.conf file should have been generated
 while running ./configure.
 
-The second line starts the daemon. There will be a better way to do this in
+The third line starts the daemon. There will be a better way to do this in
 future.
 
 Signals:
