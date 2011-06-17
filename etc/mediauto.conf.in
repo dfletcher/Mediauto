@@ -7,7 +7,14 @@
   <program name="mencoder" enabled="@MENCODER_ENABLED@" path="@MENCODER@" />
   <program name="eject" enabled="@EJECT_ENABLED@" path="@EJECT@" />
 
+  <!-- Where should new media files go? -->
+  <variable name="dvd.destination" value="/share/Movies" />
+
+  <!-- Delay in main program loop between creating new processes and firing
+       signals. -->
   <variable name="mainloop.delay" value="2500" />
+
+  <!-- Maximum number of concurrent processes. -->
   <variable name="processor.max" value="3" />
 
   <insert media="dvd_rom">
