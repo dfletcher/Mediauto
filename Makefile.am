@@ -1,2 +1,2 @@
-SUBDIRS = site-packages ui etc
+SUBDIRS = site-packages gnome-monitor etc
 ACLOCAL_AMFLAGS = -I m4

@@ -4,7 +4,7 @@
 AC_PREREQ(2.59)
 AC_INIT([mediauto], [0.0.0], [graveyhead@gmail.com])
 AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_SRCDIR([ui/main.c])
+AC_CONFIG_SRCDIR([gnome-monitor/main.c])
 AC_CONFIG_HEADER([config.h])
 AM_INIT_AUTOMAKE
 
@@ -65,7 +65,7 @@ AC_CONFIG_FILES([Makefile
                  etc/dbus-1/Makefile
                  etc/dbus-1/system.d/Makefile
                  site-packages/Makefile
-                 ui/Makefile])
+                 gnome-monitor/Makefile])
 AC_OUTPUT
 
 echo

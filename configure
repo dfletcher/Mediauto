@@ -273,7 +273,7 @@ PACKAGE_VERSION='0.0.0'
 PACKAGE_STRING='mediauto 0.0.0'
 PACKAGE_BUGREPORT='graveyhead@gmail.com'
 
-ac_unique_file="ui/main.c"
+ac_unique_file="gnome-monitor/main.c"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>
@@ -6932,7 +6932,7 @@ fi
 done
 
 
-                                                                      ac_config_files="$ac_config_files Makefile etc/Makefile etc/mediauto.conf etc/dbus-1/Makefile etc/dbus-1/system.d/Makefile site-packages/Makefile ui/Makefile"
+                                                                      ac_config_files="$ac_config_files Makefile etc/Makefile etc/mediauto.conf etc/dbus-1/Makefile etc/dbus-1/system.d/Makefile site-packages/Makefile gnome-monitor/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -7496,7 +7496,7 @@ do
   "etc/dbus-1/Makefile" ) CONFIG_FILES="$CONFIG_FILES etc/dbus-1/Makefile" ;;
   "etc/dbus-1/system.d/Makefile" ) CONFIG_FILES="$CONFIG_FILES etc/dbus-1/system.d/Makefile" ;;
   "site-packages/Makefile" ) CONFIG_FILES="$CONFIG_FILES site-packages/Makefile" ;;
-  "ui/Makefile" ) CONFIG_FILES="$CONFIG_FILES ui/Makefile" ;;
+  "gnome-monitor/Makefile" ) CONFIG_FILES="$CONFIG_FILES gnome-monitor/Makefile" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
