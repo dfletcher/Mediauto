@@ -123,4 +123,6 @@ TODO:
     - Command line monitor (in progress, currently broken)
     - XBMC plugin / support - ping XBMC to reload it's library when new files
       are available.
+    - Title lookups on themoviedb.org and thetvdb.com
+    - Local database of DVD Id, checksum, title and any other relevant details.
 
