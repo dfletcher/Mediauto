@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<mediauto>
+
+  <program name="dvdbackup" enabled="@DVDBACKUP_ENABLED@" path="@DVDBACKUP@" />
+  <program name="mkisofs" enabled="@MKISOFS_ENABLED@" path="@MKISOFS@" />
+  <program name="mencoder" enabled="@MENCODER_ENABLED@" path="@MENCODER@" />
+  <program name="eject" enabled="@EJECT_ENABLED@" path="@EJECT@" />
+
+  <variable name="mainloop.delay" value="2500" />
+  <variable name="processor.max" value="3" />
+
+  <insert media="dvd_rom">
+    <process name="dvd.info" />
+    <process name="dvd.copy" />
+    <process name="dvd.eject" />
+    <process name="dvd.iso" />
+    <process name="dvd.clean" />
+  </insert>
+
+</mediauto>
