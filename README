@@ -88,6 +88,13 @@ Signals:
 
 Mediauto publishes progress of operations in progress over D-Bus with signals:
 
+        Signal name: ProcessQueued
+    D-Bus interface: org.mediauto.Mediauto.Manager
+         Sender bus: org.mediauto.Mediauto
+        Object path: /org/mediauto/Mediauto/Manager
+          Arguments: (string)process_type, (string)process_id
+        Description: Sent when a process is queued.
+
         Signal name: ProcessStarted
     D-Bus interface: org.mediauto.Mediauto.Manager
          Sender bus: org.mediauto.Mediauto
