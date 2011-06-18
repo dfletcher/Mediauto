@@ -12,48 +12,49 @@ from dbus import glib
 gobject.threads_init()
 glib.init_threads()
 bus = dbus.SystemBus()
-processes = {}
+activeprocs = {}
 stdscr = None
 
 n = 1
 def draw():
-  global processes, n
+  global activeprocs, n
   stdscr.clear()
-  i = 0
-  #stdscr.addstr(str(processes))
-  stdscr.addstr('n: %d' % n)
+  i = 1
   n += 1
-  for upi in processes.keys():
-    complete = processes[upi]
-    n = int(complete * 20)
-    stdscr.addstr(i, 2, upi[-15:])
-    stdscr.addstr(i, 17, '[')
-    stdscr.addstr(i, 18, '=' * n)
-    stdscr.addstr(i, n+1, '>')
-    stdscr.addstr(i, 37, ']')
+  for upi in activeprocs.keys():
+    complete = activeprocs[upi]
+    n = int(complete * 50)
+    i2 = i+1
+    a = upi.split('/')
+    action = a[-1]
+    label = a[-2]
+    stdscr.addstr(i, 5, action + ': ' + label)
+    stdscr.addstr(i2, 5, '[')
+    stdscr.addstr(i2, 6, '=' * n)
+    stdscr.addstr(i2, n+6, '>')
+    stdscr.addstr(i2, 56, ']')
+    stdscr.addstr(i2, 58, '%.2f%%' % (complete * 100))
     i += 2
   stdscr.refresh()
 
 def process_started(type, upi):
-  global processes
-  processes[upi] = 0.0
+  global activeprocs
+  activeprocs[upi] = 0.0
+  draw()
 
 def process_ended(type, upi):
-  global processes
-  del processes[upi]
+  global activeprocs
+  if upi in activeprocs: del activeprocs[upi]
+  draw()
 
 def process_progress(type, upi, complete):
-  global processes
-  processes[upi] = complete
-
-def sigwatch(*args):
-  #print 'signal: ' + str(args)
-  pass
+  global activeprocs
+  activeprocs[upi] = complete
+  draw()
 
 def mainloop():
   c = stdscr.getch()
   if c: sys.exit(0)
-  draw()
   return True
 
 def cleanup():
@@ -61,8 +62,6 @@ def cleanup():
   stdscr.keypad(0)
   curses.echo()
   curses.endwin()
-  global processes
-  print str(processes)
 
 if __name__ == '__main__':
   stdscr = curses.initscr()
@@ -70,13 +69,6 @@ if __name__ == '__main__':
   curses.cbreak()
   stdscr.keypad(1)
   atexit.register(cleanup)
-  bus.add_signal_receiver(
-    sigwatch,
-    None,
-    None,
-    'org.mediauto.Mediauto',
-    None
-  )
   bus.add_signal_receiver(
     process_progress,
     'PercentComplete',
@@ -99,7 +91,6 @@ if __name__ == '__main__':
     '/org/mediauto/Mediauto/Manager'
   )
   draw()
-  gobject.timeout_add(1000, mainloop)
+  #gobject.timeout_add(1000, mainloop)
   gobject.MainLoop().run()
-  #while mainloop():
-  #  time.sleep(1)
+
