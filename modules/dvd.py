@@ -7,8 +7,9 @@ import stat
 import tempfile
 import subprocess
 
-import config
-import process
+import mediauto.module
+import mediauto.config
+import mediauto.process
 
 class DVDException(Exception):
   def __init__(self, message): Exception.__init__(self, message)
@@ -20,19 +21,19 @@ def log(msg):
 def normalize_dvd_title(title):
   return title.replace('_', ' ').title()
 
-class DVDFetchInfoProcess(process.MediautoProcess):
+class DVDFetchInfoProcess(mediauto.process.MediautoProcess):
   def __init__(self, info):
     self.info = info
-    process.MediautoProcess.__init__(self, info['upi'] + '/' + self.type())
+    mediauto.process.MediautoProcess.__init__(self, info['upi'] + '/' + self.type())
   def type(self): return 'dvd.info'
   def run(self):
     self.info['files'] = []
     self.info['titlesets'] = {}
-    if not config.program_enabled('dvdbackup'):
+    if not mediauto.config.program_enabled('dvdbackup'):
       # TODO: print warning about dvdbackup not being enabled
       return
     cmd = [
-      config.program_path('dvdbackup'),
+      mediauto.config.program_path('dvdbackup'),
       '--input', self.info['device'], '--info'
     ]
     in_filescan_mode = 0
@@ -99,19 +100,19 @@ class DVDFetchInfoProcess(process.MediautoProcess):
       line = p.stdout.readline() # Read next line.
     p.stdout.close()
 
-class DVDCopyProcess(process.MediautoProcess):
+class DVDCopyProcess(mediauto.process.MediautoProcess):
   def __init__(self, info):
     self.info = info
-    process.MediautoProcess.__init__(self, info['upi'] + '/' + self.type())
+    mediauto.process.MediautoProcess.__init__(self, info['upi'] + '/' + self.type())
   def type(self): return 'dvd.copy'
   def depends(self): return [ 'dvd.info' ]
   def run(self):
     """ Copy the DVD into the temporary directory info['tempdir']. """
-    if not config.program_enabled('dvdbackup'):
+    if not mediauto.config.program_enabled('dvdbackup'):
       raise DVDException("DVDBackup not found, cannot copy DVD.")
     # Run `dvdcopy`.
     cmd = [
-      config.program_path('dvdbackup'),
+      mediauto.config.program_path('dvdbackup'),
       '--input',  self.info['device'],
       '--output', self.info['tempdir'],
       '--name', self.info['label'], '-M'
@@ -139,32 +140,32 @@ class DVDCopyProcess(process.MediautoProcess):
       time.sleep(5)
     self.set_progress(1.0)
 
-class DVDEjectProcess(process.MediautoProcess):
+class DVDEjectProcess(mediauto.process.MediautoProcess):
   def __init__(self, info):
     self.info = info
-    process.MediautoProcess.__init__(self, info['upi'] + '/' + self.type())
+    mediauto.process.MediautoProcess.__init__(self, info['upi'] + '/' + self.type())
   def type(self): return 'dvd.eject'
   def depends(self): return [ 'dvd.copy' ]
   def run(self):
-    if not config.program_enabled('eject'):
+    if not mediauto.config.program_enabled('eject'):
       raise DVDException("Eject not found, cannot eject DVD.")
-    cmd = [ config.program_path('eject'), self.info['device'] ]
+    cmd = [ mediauto.config.program_path('eject'), self.info['device'] ]
     #log(str(cmd))
     subprocess.Popen(cmd).wait()
     self.set_progress(1.0)
 
-class DVDISOProcess(process.MediautoProcess):
+class DVDISOProcess(mediauto.process.MediautoProcess):
   def __init__(self, info):
     self.info = info
-    process.MediautoProcess.__init__(self, info['upi'] + '/' + self.type())
+    mediauto.process.MediautoProcess.__init__(self, info['upi'] + '/' + self.type())
   def type(self): return 'dvd.iso'
   def depends(self): return [ 'dvd.copy' ]
   def run(self):
-    if not config.program_enabled('mkisofs'):
+    if not mediauto.config.program_enabled('mkisofs'):
       raise DVDException("mkisofs not found, cannot create ISO for DVD.")
     # Run `mkisofs`.
     cmd = [
-      config.program_path('mkisofs'),
+      mediauto.config.program_path('mkisofs'),
       '-dvd-video',
       '-udf',
       '-o', self.info['destfile'],
@@ -186,10 +187,10 @@ class DVDISOProcess(process.MediautoProcess):
     proc.stdout.close()
     self.set_progress(1.0)
 
-class DVDCleanProcess(process.MediautoProcess):
+class DVDCleanProcess(mediauto.process.MediautoProcess):
   def __init__(self, info):
     self.info = info
-    process.MediautoProcess.__init__(self, info['upi'] + '/' + self.type())
+    mediauto.process.MediautoProcess.__init__(self, info['upi'] + '/' + self.type())
   def type(self): return 'dvd.clean'
   def depends(self): return [ 'dvd.iso' ]
   def run(self):
@@ -220,13 +221,13 @@ class DVDCleanProcess(process.MediautoProcess):
       time.sleep(5)
     self.set_progress(1.0)
 
-class DVD(process.MediautoProcessor):
+class DVD(mediauto.process.MediautoProcessor):
   def __init__(self, info):
-    process.MediautoProcessor.__init__(self)
+    mediauto.process.MediautoProcessor.__init__(self)
     # TODO: improve file name.
     if info['label'] != None: info['destfilename'] = normalize_dvd_title(info['label']) + '.iso'
     else: info['destfilename'] = 'UNKNOWN_DISC.iso'
-    info['destfile'] = os.path.join(config.variable('dvd.destination'), info['destfilename'])
+    info['destfile'] = os.path.join(mediauto.config.variable('dvd.destination'), info['destfilename'])
     info['tempdir'] = tempfile.mkdtemp()
     info['rootdir'] = os.path.join(info['tempdir'], info['label'])
     self.declare(DVDFetchInfoProcess(info))
@@ -235,3 +236,5 @@ class DVD(process.MediautoProcessor):
     self.declare(DVDISOProcess(info))
     self.declare(DVDCleanProcess(info))
     os.system('killall totem') # Hax.
+
+mediauto.module.processor_register('dvd_rom', DVD)

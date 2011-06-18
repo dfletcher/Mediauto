@@ -6932,7 +6932,7 @@ fi
 done
 
 
-                                                                      ac_config_files="$ac_config_files Makefile etc/Makefile etc/mediauto.conf etc/dbus-1/Makefile etc/dbus-1/system.d/Makefile site-packages/Makefile gnome-monitor/Makefile"
+                                                                                                    ac_config_files="$ac_config_files Makefile src/Makefile modules/Makefile etc/Makefile etc/mediauto.conf etc/dbus-1/Makefile etc/dbus-1/system.d/Makefile site-packages/Makefile site-packages/mediauto/Makefile gnome-monitor/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -7491,11 +7491,14 @@ do
   case "$ac_config_target" in
   # Handling of arguments.
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+  "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
+  "modules/Makefile" ) CONFIG_FILES="$CONFIG_FILES modules/Makefile" ;;
   "etc/Makefile" ) CONFIG_FILES="$CONFIG_FILES etc/Makefile" ;;
   "etc/mediauto.conf" ) CONFIG_FILES="$CONFIG_FILES etc/mediauto.conf" ;;
   "etc/dbus-1/Makefile" ) CONFIG_FILES="$CONFIG_FILES etc/dbus-1/Makefile" ;;
   "etc/dbus-1/system.d/Makefile" ) CONFIG_FILES="$CONFIG_FILES etc/dbus-1/system.d/Makefile" ;;
   "site-packages/Makefile" ) CONFIG_FILES="$CONFIG_FILES site-packages/Makefile" ;;
+  "site-packages/mediauto/Makefile" ) CONFIG_FILES="$CONFIG_FILES site-packages/mediauto/Makefile" ;;
   "gnome-monitor/Makefile" ) CONFIG_FILES="$CONFIG_FILES gnome-monitor/Makefile" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   "config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;

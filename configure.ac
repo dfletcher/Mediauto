@@ -60,11 +60,14 @@ AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([ftime getcwd getmntent gettimeofday memset mkdir setlocale strcasecmp strdup strerror strncasecmp strstr strtol])
 
 AC_CONFIG_FILES([Makefile
+                 src/Makefile
+                 modules/Makefile
                  etc/Makefile
                  etc/mediauto.conf
                  etc/dbus-1/Makefile
                  etc/dbus-1/system.d/Makefile
                  site-packages/Makefile
+                 site-packages/mediauto/Makefile
                  gnome-monitor/Makefile])
 AC_OUTPUT
 

@@ -17,6 +17,11 @@
   <!-- Maximum number of concurrent processes. -->
   <variable name="processor.max" value="3" />
 
+  <!-- Possible module directory locations. -->
+  <module-dir path="/etc/mediauto/modules" />
+  <module-dir path="~/.mediauto/modules" />
+  <module-dir path="./modules" />
+
   <insert media="dvd_rom">
     <process name="dvd.info" />
     <process name="dvd.copy" />

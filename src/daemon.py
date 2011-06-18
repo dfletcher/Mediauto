@@ -8,8 +8,8 @@ import dbus.service
 from dbus import glib
 from dbus.service import BusName
 
-import dvd
-import config
+import mediauto.module
+import mediauto.config
 
 # Variables
 active = {}
@@ -20,7 +20,7 @@ processor_queue = []
 running_queue = []
 
 # Constants
-MAX_PROCESSES = int(config.variable('processor.max'))
+MAX_PROCESSES = int(mediauto.config.variable('processor.max'))
 
 class MediautoManager(dbus.service.Object):
   def __init__(self, path):
@@ -33,9 +33,6 @@ class MediautoManager(dbus.service.Object):
   @dbus.service.signal(dbus_interface='org.mediauto.Mediauto.Manager', signature='ssd')
   def PercentComplete(self, ptype, upi, complete): pass
 manager = MediautoManager('/org/mediauto/Mediauto/Manager')
-
-def dvd_rom_processor(info):
-  return dvd.DVD(info)
 
 # TODO: real logs.
 def log(msg):
@@ -59,11 +56,6 @@ def hal_device_insert(udi):
 
   # Find a processor constructor function. for example "dvd_rom_processor".
   type = iface.GetPropertyString('volume.disc.type')
-  processorname = type + '_processor'
-  try: processor = globals()[processorname]
-  except KeyError:
-    log('No processor for type: ' + type)
-    return
 
   # Gather media and device info.
   label = iface.GetPropertyInteger('volume.label')
@@ -71,7 +63,6 @@ def hal_device_insert(udi):
     'udi': udi,
     'upi': '/org/mediauto/Mediauto/Process/' + type + '/' + label,
     'type': type,
-    'processorname': processorname,
     'device': iface.GetPropertyInteger('block.device'),
     'product': iface.GetPropertyString('info.product'),
     'label': label,
@@ -79,11 +70,13 @@ def hal_device_insert(udi):
     'capacity': iface.GetPropertyInteger('volume.disc.capacity')
   }
   active[udi] = info
-  processes = config.insert_rule(info['type'])
-  processor = processor(info)
-  for process in processes: processor.queue(process)
-  processor_queue.append(processor)
-  log('insert rule: %s' % processes)
+
+  processor = mediauto.module.processor_instance(type, info)
+  if processor:
+    processes = mediauto.config.insert_rule(type)
+    for process in processes: processor.queue(process)
+    processor_queue.append(processor)
+    log('insert rule: %s' % processes)
 
 def hal_device_remove(udi):
   try: info = active[udi]
@@ -140,7 +133,7 @@ if __name__ == '__main__':
     'org.freedesktop.Hal',
     '/org/freedesktop/Hal/Manager'
   )
-  
+
   # Run forever.
-  gobject.timeout_add(int(config.variable('mainloop.delay')), mediauto_queue_processor)
+  gobject.timeout_add(int(mediauto.config.variable('mainloop.delay')), mediauto_queue_processor)
   gobject.MainLoop().run()

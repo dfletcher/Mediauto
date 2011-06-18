@@ -66,7 +66,8 @@ Running:
 
     sudo cp etc/dbus-1/system.d/mediauto.conf /etc/dbus-1/system.d/
     gedit etc/mediauto.conf
-    python site-packages/mediauto.py --config=etc/mediauto.conf
+    export PYTHONPATH=./site-packages
+    python src/daemon.py --config=etc/mediauto.conf
 
 The first line copies the D-Bus configuration rules into your system and is
 required to enable signals. Currently there is an entry in there giving user
@@ -77,7 +78,10 @@ Edit the configuration file and change the default dvd.destination and any
 other desired tweaks. The etc/mediauto.conf file should have been generated
 while running ./configure.
 
-The third line starts the daemon. There will be a better way to do this in
+The third line tells Python where to find the mediauto module package. Once
+system installation is supported, this should no longer be necessary.
+
+The fourth line starts the daemon. There will be a better way to do this in
 future.
 
 Signals:
@@ -110,9 +114,8 @@ Future D-Bus API additions will allow programs to query other information about
 processes and media (discs) using the process_id supplied by these signals.
 
 TODO:
-    - Module system. mediauto.py should not directly include any media types
-      (currently it hard-codes DVD). Also, modules should be able to hook
-      other modules processes, inserting code to run before and after.
+    - Modules should be able to hook other modules processes,
+      inserting code to run before and/or after.
     - init scripts for various systems
     - Logging
     - CD support
