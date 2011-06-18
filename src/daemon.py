@@ -42,7 +42,7 @@ def hal_device_insert(udi):
 
   time.sleep(5) # Wait for drive to settle.
 
-  device = bus.get_object("org.freedesktop.Hal", udi)
+  device = bus.get_object('org.freedesktop.Hal', udi)
   iface = dbus.Interface(device, 'org.freedesktop.Hal.Device')
 
   # This is handy for iterating over device properties for debugging.
@@ -64,13 +64,10 @@ def hal_device_insert(udi):
     'upi': '/org/mediauto/Mediauto/Process/' + type + '/' + label,
     'type': type,
     'device': iface.GetPropertyInteger('block.device'),
-    'product': iface.GetPropertyString('info.product'),
     'label': label,
-    'size': iface.GetPropertyInteger('volume.size'),
-    'capacity': iface.GetPropertyInteger('volume.disc.capacity')
+    'size': iface.GetPropertyInteger('volume.size')
   }
   active[udi] = info
-
   processor = mediauto.module.processor_instance(type, info)
   if processor:
     processes = mediauto.config.insert_rule(type)
@@ -79,9 +76,32 @@ def hal_device_insert(udi):
     log('insert rule: %s' % processes)
 
 def hal_device_remove(udi):
-  try: info = active[udi]
-  except KeyError: return
-  del active[udi]
+  if udi in active.keys(): del active[udi]
+
+def udisks_device_changed(udi):
+  proxy = bus.get_object('org.freedesktop.UDisks', udi)
+  iface = dbus.Interface(proxy, 'org.freedesktop.DBus.Properties')
+  props = iface.GetAll('org.freedesktop.UDisks.Device')
+  if not props['DeviceIsMounted']:
+    if udi in active.keys(): del active[udi]
+    return
+  type = props['DriveMedia']
+  label = props['IdLabel']
+  info = {
+    'udi': udi,
+    'upi': '/org/mediauto/Mediauto/Process/' + type + '/' + label,
+    'type': type,
+    'device': props['DeviceFile'],
+    'label': label,
+    'size': props['PartitionSize']
+  }
+  active[udi] = info
+  processor = mediauto.module.processor_instance(type, info)
+  if processor:
+    processes = mediauto.config.insert_rule(type)
+    for process in processes: processor.queue(process)
+    processor_queue.append(processor)
+    log('insert rule: %s' % processes)
 
 def mediauto_queue_processor():
 
@@ -116,7 +136,7 @@ def mediauto_queue_processor():
 # Main daemon routine.
 if __name__ == '__main__':
 
-  # Setup - connect HAL device insert to hal_device_insert()
+  # CENTOS 5
   bus.add_signal_receiver(
     hal_device_insert,
     'DeviceAdded',
@@ -125,13 +145,22 @@ if __name__ == '__main__':
     '/org/freedesktop/Hal/Manager'
   )
 
-  # Setup - connect HAL device removal to hal_device_remove()
+  # CENTOS 5
   bus.add_signal_receiver(
     hal_device_remove,
     'DeviceRemoved',
     'org.freedesktop.Hal.Manager',
     'org.freedesktop.Hal',
     '/org/freedesktop/Hal/Manager'
+  )
+
+  # Ubuntu 11.04
+  bus.add_signal_receiver(
+    udisks_device_changed,
+    'DeviceChanged',
+    None,
+    'org.freedesktop.UDisks',
+    '/org/freedesktop/UDisks'
   )
 
   # Run forever.

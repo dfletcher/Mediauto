@@ -30,4 +30,12 @@
     <process name="dvd.clean" />
   </insert>
 
+  <insert media="optical_dvd">
+    <process name="dvd.info" />
+    <process name="dvd.copy" />
+    <process name="dvd.eject" />
+    <process name="dvd.iso" />
+    <process name="dvd.clean" />
+  </insert>
+
 </mediauto>

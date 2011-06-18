@@ -238,3 +238,5 @@ class DVD(mediauto.process.MediautoProcessor):
     os.system('killall totem') # Hax.
 
 mediauto.module.processor_register('dvd_rom', DVD)
+mediauto.module.processor_register('optical_dvd', DVD)
+
