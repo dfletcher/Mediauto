@@ -27,6 +27,8 @@ class MediautoManager(dbus.service.Object):
     self.busname = dbus.service.BusName('org.mediauto.Mediauto', bus)
     dbus.service.Object.__init__(self, self.busname, path)
   @dbus.service.signal(dbus_interface='org.mediauto.Mediauto.Manager', signature='ss')
+  def ProcessQueued(self, ptype, upi): pass
+  @dbus.service.signal(dbus_interface='org.mediauto.Mediauto.Manager', signature='ss')
   def ProcessStarted(self, ptype, upi): pass
   @dbus.service.signal(dbus_interface='org.mediauto.Mediauto.Manager', signature='ss')
   def ProcessEnded(self, ptype, upi): pass
@@ -37,6 +39,19 @@ manager = MediautoManager('/org/mediauto/Mediauto/Manager')
 # TODO: real logs.
 def log(msg):
   print msg
+
+def queue_processes(udi, type, info):
+  global active
+  active[udi] = info
+  processor = mediauto.module.processor_instance(type, info)
+  if processor:
+    processes = mediauto.config.insert_rule(type)
+    for process in processes:
+      processor.queue(process)
+      p = processor.get(process)
+      manager.ProcessQueued(p.type(), p.upi())
+    processor_queue.append(processor)
+    #log('insert rule: %s' % processes)
 
 def hal_device_insert(udi):
 
@@ -67,13 +82,7 @@ def hal_device_insert(udi):
     'label': label,
     'size': iface.GetPropertyInteger('volume.size')
   }
-  active[udi] = info
-  processor = mediauto.module.processor_instance(type, info)
-  if processor:
-    processes = mediauto.config.insert_rule(type)
-    for process in processes: processor.queue(process)
-    processor_queue.append(processor)
-    log('insert rule: %s' % processes)
+  queue_processes(udi, type, info)
 
 def hal_device_remove(udi):
   if udi in active.keys(): del active[udi]
@@ -95,13 +104,7 @@ def udisks_device_changed(udi):
     'label': label,
     'size': props['PartitionSize']
   }
-  active[udi] = info
-  processor = mediauto.module.processor_instance(type, info)
-  if processor:
-    processes = mediauto.config.insert_rule(type)
-    for process in processes: processor.queue(process)
-    processor_queue.append(processor)
-    log('insert rule: %s' % processes)
+  queue_processes(udi, type, info)
 
 def mediauto_queue_processor():
 

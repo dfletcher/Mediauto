@@ -31,11 +31,16 @@ def draw():
     stdscr.addstr(i, 5, action + ': ' + label)
     stdscr.addstr(i2, 5, '[')
     stdscr.addstr(i2, 6, '=' * n)
-    stdscr.addstr(i2, n+6, '>')
+    if n != 0: stdscr.addstr(i2, n+6, '>')
     stdscr.addstr(i2, 56, ']')
     stdscr.addstr(i2, 58, '%.2f%%' % (complete * 100))
     i += 2
   stdscr.refresh()
+
+def process_queued(type, upi):
+  global activeprocs
+  activeprocs[upi] = 0.0
+  draw()
 
 def process_started(type, upi):
   global activeprocs
@@ -70,8 +75,8 @@ if __name__ == '__main__':
   stdscr.keypad(1)
   atexit.register(cleanup)
   bus.add_signal_receiver(
-    process_progress,
-    'PercentComplete',
+    process_queued,
+    'ProcessQueued',
     'org.mediauto.Mediauto.Manager',
     'org.mediauto.Mediauto',
     '/org/mediauto/Mediauto/Manager'
@@ -79,6 +84,13 @@ if __name__ == '__main__':
   bus.add_signal_receiver(
     process_started,
     'ProcessStarted',
+    'org.mediauto.Mediauto.Manager',
+    'org.mediauto.Mediauto',
+    '/org/mediauto/Mediauto/Manager'
+  )
+  bus.add_signal_receiver(
+    process_progress,
+    'PercentComplete',
     'org.mediauto.Mediauto.Manager',
     'org.mediauto.Mediauto',
     '/org/mediauto/Mediauto/Manager'
