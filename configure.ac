@@ -32,7 +32,8 @@ dnl echo "     FAKE: ${FAKE}"
 
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-ldvd':
-AC_CHECK_LIB([dvd], [main])
+#AC_CHECK_LIB([dvd], [main])
+AC_CHECK_LIB([panel-applet-2], [main])
 
 # Checks for header files.
 AC_HEADER_DIRENT
