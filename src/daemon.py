@@ -137,31 +137,37 @@ def mediauto_queue_processor():
 if __name__ == '__main__':
 
   # CENTOS 5
-  bus.add_signal_receiver(
-    hal_device_insert,
-    'DeviceAdded',
-    'org.freedesktop.Hal.Manager',
-    'org.freedesktop.Hal',
-    '/org/freedesktop/Hal/Manager'
-  )
+  try:
+    bus.add_signal_receiver(
+      hal_device_insert,
+      'DeviceAdded',
+      'org.freedesktop.Hal.Manager',
+      'org.freedesktop.Hal',
+      '/org/freedesktop/Hal/Manager'
+    )
+  except: pass
 
   # CENTOS 5
-  bus.add_signal_receiver(
-    hal_device_remove,
-    'DeviceRemoved',
-    'org.freedesktop.Hal.Manager',
-    'org.freedesktop.Hal',
-    '/org/freedesktop/Hal/Manager'
-  )
+  try:
+    bus.add_signal_receiver(
+      hal_device_remove,
+      'DeviceRemoved',
+      'org.freedesktop.Hal.Manager',
+      'org.freedesktop.Hal',
+      '/org/freedesktop/Hal/Manager'
+    )
+  except: pass
 
   # Ubuntu 11.04
-  bus.add_signal_receiver(
-    udisks_device_changed,
-    'DeviceChanged',
-    None,
-    'org.freedesktop.UDisks',
-    '/org/freedesktop/UDisks'
-  )
+  try:
+    bus.add_signal_receiver(
+      udisks_device_changed,
+      'DeviceChanged',
+      None,
+      'org.freedesktop.UDisks',
+      '/org/freedesktop/UDisks'
+    )
+  except: pass
 
   # Run forever.
   gobject.timeout_add(int(mediauto.config.variable('mainloop.delay')), mediauto_queue_processor)
